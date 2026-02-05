@@ -1,0 +1,140 @@
+<svg width="1000" height="600" viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="carGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#2C3E50;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#34495E;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1C2833;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="wheelGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#555;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#222;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="glassGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#B3E5FC;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#81D4FA;stop-opacity:0.8" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+    <filter id="reflection">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1000" height="600" fill="#F5F5F5"/>
+  
+  <!-- Light gradient background -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E8E8E8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="1000" height="600" fill="url(#bgGradient)"/>
+  
+  <!-- Car Group - Sedan -->
+  <g filter="url(#shadow)" transform="translate(150, 180)">
+    
+    <!-- Car Shadow -->
+    <ellipse cx="350" cy="420" rx="280" ry="40" fill="#000000" opacity="0.1"/>
+    
+    <!-- Undercarriage/Chassis -->
+    <rect x="80" y="340" width="540" height="30" rx="5" fill="#1a1a1a"/>
+    
+    <!-- Main Body - Lower Section -->
+    <path d="M 100 340 L 120 280 L 580 280 L 600 340 Z" fill="url(#carGradient)" stroke="#1C2833" stroke-width="1.5"/>
+    
+    <!-- Main Body - Upper Section (Cabin) -->
+    <path d="M 140 280 L 180 140 L 520 140 L 560 280 Z" fill="url(#carGradient)" stroke="#1C2833" stroke-width="1.5"/>
+    
+    <!-- Roof -->
+    <path d="M 180 140 L 200 100 L 520 100 L 540 140 Z" fill="#3D5A80" stroke="#1C2833" stroke-width="1"/>
+    
+    <!-- Front Hood (Accent) -->
+    <path d="M 100 340 L 120 280 L 180 260 L 140 340 Z" fill="#253549" stroke="#0F1419" stroke-width="1"/>
+    
+    <!-- Trunk (Accent) -->
+    <path d="M 560 280 L 580 280 L 620 340 L 600 340 Z" fill="#253549" stroke="#0F1419" stroke-width="1"/>
+    
+    <!-- Front Bumper -->
+    <rect x="80" y="330" width="60" height="20" rx="3" fill="#1a1a1a" stroke="#000" stroke-width="1"/>
+    <rect x="85" y="335" width="50" height="8" fill="#333333" opacity="0.6"/>
+    
+    <!-- Rear Bumper -->
+    <rect x="620" y="330" width="60" height="20" rx="3" fill="#1a1a1a" stroke="#000" stroke-width="1"/>
+    <rect x="625" y="335" width="50" height="8" fill="#333333" opacity="0.6"/>
+    
+    <!-- Front Windshield -->
+    <path d="M 145 280 L 180 140 L 200 100 L 175 260 Z" fill="url(#glassGradient)" stroke="#5A7A9B" stroke-width="1.5" filter="url(#reflection)"/>
+    
+    <!-- Rear Windshield -->
+    <path d="M 525 140 L 560 280 L 585 260 L 540 100 Z" fill="url(#glassGradient)" stroke="#5A7A9B" stroke-width="1.5" filter="url(#reflection)"/>
+    
+    <!-- Side Windows - Front -->
+    <path d="M 185 200 L 210 140 L 240 140 L 220 200 Z" fill="url(#glassGradient)" stroke="#5A7A9B" stroke-width="1" opacity="0.8"/>
+    
+    <!-- Side Windows - Middle -->
+    <path d="M 250 210 L 270 140 L 450 140 L 430 210 Z" fill="url(#glassGradient)" stroke="#5A7A9B" stroke-width="1" opacity="0.8"/>
+    
+    <!-- Side Windows - Rear -->
+    <path d="M 475 210 L 520 140 L 540 140 L 510 200 Z" fill="url(#glassGradient)" stroke="#5A7A9B" stroke-width="1" opacity="0.8"/>
+    
+    <!-- Headlights - Left -->
+    <ellipse cx="115" cy="295" rx="12" ry="15" fill="#FFF4E6" stroke="#DAA520" stroke-width="1.5"/>
+    <circle cx="115" cy="295" r="6" fill="#FFD700" opacity="0.7"/>
+    
+    <!-- Headlights - Right -->
+    <ellipse cx="135" cy="295" rx="12" ry="15" fill="#FFF4E6" stroke="#DAA520" stroke-width="1.5"/>
+    <circle cx="135" cy="295" r="6" fill="#FFD700" opacity="0.7"/>
+    
+    <!-- Taillights - Left -->
+    <ellipse cx="605" cy="295" rx="12" ry="15" fill="#FFE6E6" stroke="#CC0000" stroke-width="1.5"/>
+    <circle cx="605" cy="295" r="6" fill="#FF0000" opacity="0.6"/>
+    
+    <!-- Taillights - Right -->
+    <ellipse cx="625" cy="295" rx="12" ry="15" fill="#FFE6E6" stroke="#CC0000" stroke-width="1.5"/>
+    <circle cx="625" cy="295" r="6" fill="#FF0000" opacity="0.6"/>
+    
+    <!-- Front Wheel -->
+    <g transform="translate(140, 365)">
+      <!-- Tire -->
+      <circle cx="0" cy="0" r="50" fill="url(#wheelGradient)" stroke="#000" stroke-width="2"/>
+      <!-- Wheel Rim -->
+      <circle cx="0" cy="0" r="38" fill="none" stroke="#888" stroke-width="2"/>
+      <circle cx="0" cy="0" r="32" fill="none" stroke="#999" stroke-width="1"/>
+      <!-- Center Cap -->
+      <circle cx="0" cy="0" r="12" fill="#666" stroke="#333" stroke-width="1"/>
+      <circle cx="0" cy="0" r="8" fill="#888"/>
+      <!-- Spokes -->
+      <line x1="0" y1="-28" x2="0" y2="28" stroke="#555" stroke-width="1.5"/>
+      <line x1="-28" y1="0" x2="28" y2="0" stroke="#555" stroke-width="1.5"/>
+      <line x1="-19.8" y1="-19.8" x2="19.8" y2="19.8" stroke="#555" stroke-width="1.5"/>
+      <line x1="-19.8" y1="19.8" x2="19.8" y2="-19.8" stroke="#555" stroke-width="1.5"/>
+    </g>
+    
+    <!-- Rear Wheel -->
+    <g transform="translate(560, 365)">
+      <!-- Tire -->
+      <circle cx="0" cy="0" r="50" fill="url(#wheelGradient)" stroke="#000" stroke-width="2"/>
+      <!-- Wheel Rim -->
+      <circle cx="0" cy="0" r="38" fill="none" stroke="#888" stroke-width="2"/>
+      <circle cx="0" cy="0" r="32" fill="none" stroke="#999" stroke-width="1"/>
+      <!-- Center Cap -->
+      <circle cx="0" cy="0" r="12" fill="#666" stroke="#333" stroke-width="1"/>
+      <circle cx="0" cy="0" r="8" fill="#888"/>
+      <!-- Spokes -->
+      <line x1="0" y1="-28" x2="0" y2="28" stroke="#555" stroke-width="1.5"/>
+      <line x1="-28" y1="0" x2="28" y2="0" stroke="#555" stroke-width="1.5"/>
+      <line x1="-19.8" y1="-19.8" x2="19.8" y2="19.8" stroke="#555" stroke-width="1.5"/>
+      <line x1="-19.8" y1="19.8" x2="19.8" y2="-19.8" stroke="#555" stroke-width="1.5"/>
+    </g>
+    
+    <!-- Door Lines -->
+    <line x1="320" y1="280" x2="330" y2="340" stroke="#1C2833" stroke-width="2" opacity="0.5"/>
+    
+    <!-- Chrome Details - Bumper Lines -->
+    <rect x="90" y="345" width="540" height="2" fill="#C0C0C0" opacity="0.4"/>
+    
+  </g>
+</svg>
