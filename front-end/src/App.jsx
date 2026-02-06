@@ -3,15 +3,24 @@ import Home from "./Pages/Home"
 import Login from "./Pages/Login"
 import Register from "./Pages/Register"
 
+import { AuthProvider } from "./context/AuthContext"
+import ProtectedRoutes from "./Components/ProtectedRoutes"
+
 function App() {
 
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home/>} />
-        <Route path="/login" element={<Login/>} />
-        <Route path="/register" element={<Register/>} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={
+            <ProtectedRoutes>
+              <Home />
+            </ProtectedRoutes>
+          } />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   )
 }

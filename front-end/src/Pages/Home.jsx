@@ -5,6 +5,17 @@ import Footer from '../Components/Footer'
 import TestimonialCard from '../Components/TestimonialCard'
 
 const Home = () => {
+
+  const handleClick = async ()=>{
+    let response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/users/getUser`,{
+      credentials: "include"
+    })
+
+    let res = await response.json()
+    console.log(res)
+  }
+
+
   return (
     <div className='w-full overflow-x-hidden'>
 
@@ -30,7 +41,7 @@ const Home = () => {
           </div>
 
           <div className="buttons text-sm">
-            <button className='bg-blue-600 text-white px-3 py-2 rounded-lg mr-3'>View All Cars</button>
+            <button onClick={handleClick} className='bg-blue-600 text-white px-3 py-2 rounded-lg mr-3'>View All Cars</button>
             <button className='bg-white text-black px-3 py-2 rounded-lg border'>Become a Seller</button>
           </div>
 
