@@ -1,32 +1,57 @@
-const user = require('../models/user')
+const userModel = require('../models/user')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
 // for user login
 exports.login = async (req, res) => {
-    console.log("login hit")
 
-    const {email, password} = req.body
+    const { email, password } = req.body
 
-    const token = jwt.sign({email: req.body.email}, process.env.Jwt_secret)
+    let User = await userModel.findOne({ email })
 
-    console.log(token)
+    if (!User) return res.status(401).json({ success: false, message: "No User found" })
+
+    const token = jwt.sign({ email: email }, process.env.Jwt_secret)
+
     try {
 
-        res.cookie("token", token)
+        bcrypt.compare(password, User.password, function (err, result) {
+            if (result) {
+                res.cookie("token", token)
 
-        res.status(200).json({
-            success: true,
-            message: "User LoggedIn Successfully!"
+                res.status(200).json({
+                    success: true,
+                    message: "User LoggedIn Successfully!"
+                })
+
+            } else {
+                res.status(401).json({
+                    success: true,
+                    message: "Unsuccessfully! User LogIn"
+                })
+            }
         })
+
+
+
     }
     catch (e) {
         console.log("Login Server Error Message: ", e.message)
+        res.status(401).json({
+            success: true,
+            message: "Unsuccessfully! User LogIn"
+        })
     }
+
+}
+
+//for user Logout
+exports.logout = (req, res) => {
+    res.cookie(token, "")
 }
 
 //for user registeration
-exports.register =  (req, res) => {
+exports.register = (req, res) => {
 
     const { name, email, password, role } = req.body
     const profilePic = req.file.filename
@@ -34,16 +59,15 @@ exports.register =  (req, res) => {
     try {
 
         bcrypt.genSalt(10, function (err, salt) {
-            bcrypt.hash("plainPass", salt, async function (err, hash) {
+            bcrypt.hash(password, salt, async function (err, hash) {
 
-                let User = new user({
+                let User = new userModel({
                     name,
                     email,
                     password: hash,
                     role,
                     profilePic
                 })
-                console.log(User)
                 await User.save()
             })
         })
@@ -57,4 +81,16 @@ exports.register =  (req, res) => {
         console.log("Registration Server Error Message: ", e.message)
     }
 
+}
+
+exports.getUserDetail = async (req, res) => {
+
+    let userData = await userModel.findOne({email: req.user.email})
+
+    console.log(userData)
+
+    res.status(200).json({
+        success: true,
+        userData
+    })
 }

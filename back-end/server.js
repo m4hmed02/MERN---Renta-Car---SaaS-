@@ -1,5 +1,5 @@
 const app = require('./src/app')
-const dotenv = require('dotenv').config()
+const dotenv = require('dotenv')
 const connectDB = require('./src/utils/db')
 
 dotenv.config();
