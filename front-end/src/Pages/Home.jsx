@@ -1,25 +1,16 @@
-import React from 'react'
+import {useState} from 'react'
 import Header from '../Components/Header'
 import ItemCard from '../Components/ItemCard'
 import Footer from '../Components/Footer'
 import TestimonialCard from '../Components/TestimonialCard'
+import LoginForm from '../Components/LoginForm'
 
 const Home = () => {
-
-  const handleClick = async ()=>{
-    let response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/users/getUser`,{
-      credentials: "include"
-    })
-
-    let res = await response.json()
-    console.log(res)
-  }
-
 
   return (
     <div className='w-full overflow-x-hidden'>
 
-      <Header />
+      <Header  currentPage="/"/>
 
 
       <section className='w-full relative'>
@@ -33,7 +24,7 @@ const Home = () => {
               Find car for sale and rent near you
             </p>
 
-            <div className="font-semibold text-5xl">
+            <div className="font-bold text-5xl">
               <div>4,675 Vehicles</div>
               <div>Available</div>
             </div>
@@ -41,8 +32,8 @@ const Home = () => {
           </div>
 
           <div className="buttons text-sm">
-            <button onClick={handleClick} className='bg-blue-600 text-white px-3 py-2 rounded-lg mr-3'>View All Cars</button>
-            <button className='bg-white text-black px-3 py-2 rounded-lg border'>Become a Seller</button>
+            <button className='bg-blue-600 text-white px-5 py-3 rounded-lg mr-3'>View All Cars</button>
+            <button className='bg-white text-black px-5 py-3 rounded-lg border'>Become a Seller</button>
           </div>
 
           <div className="flex flex-col gap-3 text-sm">
@@ -130,11 +121,6 @@ const Home = () => {
 
 
       </section>
-
-
-
-
-
 
 
       <section className="w-[80%] mx-auto my-15">
@@ -249,7 +235,7 @@ const Home = () => {
 
             </div>
 
-            <button className="bg-blue-600 text-white w-fit px-5 py-2 rounded-lg">
+            <button className="bg-blue-600 text-white w-fit px-5 py-3 rounded-lg">
               Get Started
             </button>
 
@@ -496,6 +482,7 @@ const Home = () => {
 
       </section>
 
+      <LoginForm showLoginForm />
 
       <Footer />
 
