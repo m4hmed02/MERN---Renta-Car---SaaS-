@@ -3,10 +3,13 @@ import Home from "./Pages/Home"
 import Login from "./Pages/Login"
 import Register from "./Pages/Register"
 import Profile from "./Pages/Profile"
+import BrowseCars from "./Pages/BrowseCars"
 
 import { AuthProvider } from "./context/AuthContext"
 import ProtectedRoutes from "./Components/ProtectedRoutes"
 import AddCar from "./Pages/AddCar"
+import About from "./Pages/About"
+import Contact from "./Pages/Contact"
 
 function App() {
 
@@ -19,11 +22,17 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/browse" element={<BrowseCars />} />
+          <Route path="/about" element={<About/>} />
 
           <Route path="/profile" element={
             <ProtectedRoutes>
               <Profile />
             </ProtectedRoutes>
+          } />
+
+          <Route path="/contact" element={
+            <Contact/>
           } />
 
           <Route path="/addcar" element={

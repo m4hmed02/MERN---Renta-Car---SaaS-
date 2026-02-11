@@ -1,8 +1,8 @@
 import {useState} from 'react'
 import Header from '../Components/Header'
-import ItemCard from '../Components/ItemCard'
+import ItemCard from '../Components/cards/ItemCard'
 import Footer from '../Components/Footer'
-import TestimonialCard from '../Components/TestimonialCard'
+import TestimonialCard from '../Components/cards/TestimonialCard'
 import LoginForm from '../Components/LoginForm'
 
 const Home = () => {

@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
 
 
     const logout = async ()=>{
-        await fetch(`${import.meta.env.VITE_SERVER_URL}/api/users/getUser`,{
+        await fetch(`${import.meta.env.VITE_SERVER_URL}/api/users/logout`,{
             credentials: "include"
         })
 

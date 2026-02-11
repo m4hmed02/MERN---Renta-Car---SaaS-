@@ -26,7 +26,7 @@ const Profile = () => {
                     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
 
                         {/* Header Background Banner */}
-                        <div className="h-32 bg-gradient-to-r from-gray-800 to-gray-700"></div>
+                        <div className="h-32 bg-gradient-to-r from-gray-800 to-gray-600"></div>
 
                         {/* Profile Content */}
                         <div className="px-8 pb-8">
