@@ -5,6 +5,7 @@ const cors = require('cors')
 const userRouter = require('./routes/user.routes')
 const multerConfig = require('./utils/multerConfig')
 const cookieParser = require('cookie-parser')
+const vehicleRouter = require('./routes/vehicle.routes')
 
 
 app.use(cors({
@@ -16,6 +17,7 @@ app.use(cookieParser())
 app.use(express.static(path.join(__dirname, "../public")))
 
 app.use('/api/users', userRouter)
+app.use('/api/vehicles', vehicleRouter)
 
 
 

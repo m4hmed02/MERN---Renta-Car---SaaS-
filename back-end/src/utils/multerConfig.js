@@ -16,5 +16,21 @@ const userAvatarStorage = multer.diskStorage({
 })
 const avatarUpload = multer({ storage: userAvatarStorage })
 
+
+const vehicleImageStorage = multer.diskStorage({
+    destination: function(req, file, cb){
+        cb(null, path.join(__dirname, '..', '..', 'public', 'vehicleImages'))
+    },
+    filename: function(req, file, cb){
+        crypto.randomBytes(12, function(err, name){
+            const fn = name.toString('hex') + path.extname(file.originalname)
+            cb(null, fn)
+        })
+    }
+})
+const vehicleImagesUpload = multer({storage: vehicleImageStorage})
+
 // export upload variable
 module.exports = avatarUpload
+
+module.exports = vehicleImagesUpload

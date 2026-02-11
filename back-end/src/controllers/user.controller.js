@@ -87,8 +87,6 @@ exports.getUserDetail = async (req, res) => {
 
     let userData = await userModel.findOne({email: req.user.email})
 
-    console.log(userData)
-
     res.status(200).json({
         success: true,
         userData
