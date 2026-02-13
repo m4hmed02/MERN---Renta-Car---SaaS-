@@ -2,11 +2,27 @@ import Header from '../Components/Header'
 import Footer from '../Components/Footer'
 import { Search } from 'lucide-react'
 import ItemCard from '../Components/cards/ItemCard'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const BrowseCars = () => {
 
     const [vehicles, setvehicles] = useState([])
+    const [filteredVehicle, setfilteredVehicle] = useState([])
+    const [filterKeyword, setfilterKeyword] = useState(null)
+
+    const brandRef = useRef(null)
+    const priceRef = useRef(null)
+    const yearRef = useRef(null)
+
+
+    const currentYear = new Date().getFullYear();
+    const years = Array.from({ length: 30 }, (_, i) => currentYear - i);
+
+    const brands = [
+        "Toyota", "Honda", "Ford", "Chevrolet", "Nissan", "BMW", "Mercedes-Benz",
+        "Audi", "Volkswagen", "Hyundai", "Kia", "Subaru", "Mazda", "Dodge",
+        "Jeep", "Lexus", "GMC", "Cadillac", "Acura", "Infiniti"
+    ];
 
     useEffect(() => {
         const fetchVehicles = async () => {
@@ -15,11 +31,42 @@ const BrowseCars = () => {
             })
 
             let data = await res.json()
-            setvehicles(data)
+            setvehicles(data.vehicles)
+            setfilteredVehicle(data.vehicles)
         }
         fetchVehicles()
     }, [])
 
+    const handleFilterSearchChange = (e) => {
+        setfilterKeyword(e.target.value)
+    }
+
+    const handleFilterSearch = () => {
+
+        if (!filterKeyword) {
+            return
+        }
+
+        const filtered = vehicles.filter(vehicle =>
+            Object.values(vehicle).some(value =>
+                String(value).toLowerCase().includes(filterKeyword.toLowerCase())
+            )
+        )
+        setfilteredVehicle(filtered)
+    }
+
+    const handleChangeByTag = (e) => {
+        console.log(e.target.value)
+    }
+
+    const handleClearFilter = () => {
+        console.log("function called ")
+        if(brandRef.current.value == "all" && yearRef.current.value == "all" && priceRef.current.value == "all"){
+            return
+        }else{
+            console.log(brandRef.current.value, yearRef.current.value, priceRef.current.value)
+        }
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -43,8 +90,15 @@ const BrowseCars = () => {
                             <input
                                 type="text"
                                 placeholder="Search by car name, brand, or model..."
+                                onChange={handleFilterSearchChange}
                                 className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                             />
+                            <button
+                                onClick={handleFilterSearch}
+                                className="absolute right-1 top-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-semibold"
+                            >
+                                Search
+                            </button>
                         </div>
                     </div>
 
@@ -53,15 +107,32 @@ const BrowseCars = () => {
                         {/* Brand Filter */}
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-2">Brand</label>
-                            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black">
-                                <option value="">All Brands</option>
+                            <select
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                                onChange={handleChangeByTag}
+                                ref={brandRef}
+                            >
+                                <option value="all">All Brands</option>
+                                {brands.map(brand => (
+                                    <option
+                                        key={brand}
+                                        value={brand}
+                                        name={brand}
+                                    >
+                                        {brand}
+                                    </option>
+                                ))}
                             </select>
                         </div>
 
                         {/* Price Range Filter */}
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-2">Price per Day</label>
-                            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black">
+                            <select
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                                onChange={handleChangeByTag}
+                                ref={priceRef}
+                            >
                                 <option value="all">All Prices</option>
                                 <option value="0-50">$0 - $50</option>
                                 <option value="50-100">$50 - $100</option>
@@ -72,14 +143,32 @@ const BrowseCars = () => {
                         {/* Year Filter */}
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-2">Year</label>
-                            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black">
-                                <option value="">All Years</option>
+                            <select
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                                onChange={handleChangeByTag}
+                                ref={yearRef}
+                            >
+
+                                <option value="all">All Years</option>
+                                {years.map(year => (
+                                    <option
+                                        key={year}
+                                        value={year}
+                                        name={year}
+                                    >
+                                        {year}
+                                    </option>
+                                ))}
+
                             </select>
                         </div>
 
                         {/* Clear Filters */}
                         <div className="flex items-end">
-                            <button className="w-full px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-semibold">
+                            <button
+                                className="w-full px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-semibold"
+                                onClick={handleClearFilter}
+                            >
                                 Clear Filters
                             </button>
                         </div>
@@ -102,7 +191,7 @@ const BrowseCars = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 
                         {
-                            vehicles.map(vehicle => (
+                            filteredVehicle.map(vehicle => (
                                 <ItemCard
                                     key={vehicle._id}
                                     image={vehicle.image}
