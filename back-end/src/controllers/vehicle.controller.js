@@ -34,9 +34,9 @@ exports.getVehicle = async (req, res) => {
     let vehicles = await vehicleModel.find()
 
     try {
-        res.send(vehicles)
         res.status(200).json({
             success: true,
+            vehicles,
             message: "Successfully Fetched Vehicles!"
         })
     } catch (e) {
