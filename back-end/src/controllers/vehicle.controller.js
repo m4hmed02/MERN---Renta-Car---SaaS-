@@ -12,7 +12,8 @@ exports.addVehicle = async (req, res) => {
         year,
         price,
         description,
-        image
+        image,
+        owner: req.user._id
     })
 
     try {
@@ -23,7 +24,7 @@ exports.addVehicle = async (req, res) => {
         })
     } catch (e) {
         console.log("Unable to save vehicle", e.message)
-        res.status(401).json({
+        res.status(500).json({
             success: true,
             message: "Unable To Add Vehicle!"
         })
@@ -40,9 +41,33 @@ exports.getVehicle = async (req, res) => {
             message: "Successfully Fetched Vehicles!"
         })
     } catch (e) {
-        res.status(401).json({
+        res.status(500).json({
             success: false,
             message: "Unsuccessfully Fetched Vehicles!"
         })
     }
+}
+
+exports.getVehicleById = async (req, res) => {
+
+    const { id } = req.params
+
+    try {
+        let vehicle = await vehicleModel.findOne({ _id: id })
+        
+        res.status(200).json({
+            success: true,
+            message: "Vehicle Found!",
+            data: vehicle
+        })
+    } catch (e) {
+
+        console.log("Unable to find vehicle!", e.message)
+
+        res.status(500).json({
+            success: false,
+            message: "Vehicle Not Found!",
+        })
+    }
+
 }
