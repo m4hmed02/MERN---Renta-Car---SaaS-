@@ -10,6 +10,7 @@ import ProtectedRoutes from "./Components/ProtectedRoutes"
 import AddCar from "./Pages/AddCar"
 import About from "./Pages/About"
 import Contact from "./Pages/Contact"
+import CarDetail from "./Pages/CarDetail"
 
 function App() {
 
@@ -23,7 +24,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/browse" element={<BrowseCars />} />
-          <Route path="/about" element={<About/>} />
+          <Route path="/about" element={<About />} />
 
           <Route path="/profile" element={
             <ProtectedRoutes>
@@ -32,14 +33,21 @@ function App() {
           } />
 
           <Route path="/contact" element={
-            <Contact/>
+            <Contact />
           } />
 
           <Route path="/addcar" element={
             <ProtectedRoutes>
-              <AddCar/>
+              <AddCar />
             </ProtectedRoutes>
           } />
+
+          <Route path="/car-detail/:id" element={
+            <ProtectedRoutes>
+              <CarDetail />
+            </ProtectedRoutes>
+          }
+          />
 
         </Routes>
 

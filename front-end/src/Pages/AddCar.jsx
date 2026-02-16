@@ -62,7 +62,8 @@ const AddCar = () => {
         try {
             let result = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/vehicles/addVehicle`, {
                 "method": "POST",
-                body: data
+                body: data,
+                credentials: "include"
             })
             let res = await result.json()
             console.log(res)
@@ -126,7 +127,7 @@ const AddCar = () => {
                                             onChange={handleChange}
                                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                                         >
-                                            <option value="">Suzuki</option>
+                                            <option value="Suzuki">Suzuki</option>
                                             {brands.map(brand => (
                                                 <option
                                                     key={brand}

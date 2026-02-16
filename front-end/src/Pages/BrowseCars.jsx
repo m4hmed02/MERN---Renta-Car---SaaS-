@@ -55,16 +55,59 @@ const BrowseCars = () => {
         setfilteredVehicle(filtered)
     }
 
-    const handleChangeByTag = (e) => {
-        console.log(e.target.value)
+    const handleApplyFilter = () => {
+        const brand = brandRef.current.value;
+        const priceRange = priceRef.current.value;
+        const year = yearRef.current.value;
+
+        // If all filters are "all", show all vehicles
+        if (brand === "all" && priceRange === "all" && year === "all") {
+            setfilteredVehicle(vehicles);
+            setfilterKeyword(null);
+            return;
+        }
+
+        const filtered = vehicles.filter(vehicle => {
+            let matchesBrand = true;
+            let matchesPrice = true;
+            let matchesYear = true;
+
+            // Filter by brand
+            if (brand !== "all") {
+                matchesBrand = vehicle.brand.toLowerCase() === brand.toLowerCase();
+            }
+
+            // Filter by price range
+            if (priceRange !== "all") {
+                const vehiclePrice = vehicle.price;
+                if (priceRange === "0-50") {
+                    matchesPrice = vehiclePrice >= 0 && vehiclePrice <= 50;
+                } else if (priceRange === "50-100") {
+                    matchesPrice = vehiclePrice > 50 && vehiclePrice <= 100;
+                } else if (priceRange === "100+") {
+                    matchesPrice = vehiclePrice > 100;
+                }
+            }
+
+            // Filter by year
+            if (year !== "all") {
+                matchesYear = vehicle.year.toString() === year.toString();
+            }
+
+            return matchesBrand && matchesPrice && matchesYear;
+        });
+
+        setfilteredVehicle(filtered);
+        setfilterKeyword(null);
     }
 
     const handleClearFilter = () => {
-        console.log("function called ")
         if(brandRef.current.value == "all" && yearRef.current.value == "all" && priceRef.current.value == "all"){
             return
         }else{
-            console.log(brandRef.current.value, yearRef.current.value, priceRef.current.value)
+            brandRef.current.value = "all"
+            yearRef.current.value = "all"
+            priceRef.current.value = "all"
         }
     }
 
@@ -86,19 +129,13 @@ const BrowseCars = () => {
                     {/* Search Bar */}
                     <div className="mb-6">
                         <div className="relative">
-                            <Search className="absolute left-4 top-3 text-gray-400 w-5 h-5" />
+                            <Search onClick={handleFilterSearch} className="absolute right-4 top-4 text-gray-400 w-5 h-5" />
                             <input
                                 type="text"
                                 placeholder="Search by car name, brand, or model..."
                                 onChange={handleFilterSearchChange}
-                                className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                                className="w-full pl-4 pr-11 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                             />
-                            <button
-                                onClick={handleFilterSearch}
-                                className="absolute right-1 top-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-semibold"
-                            >
-                                Search
-                            </button>
                         </div>
                     </div>
 
@@ -109,8 +146,8 @@ const BrowseCars = () => {
                             <label className="block text-sm font-semibold text-gray-700 mb-2">Brand</label>
                             <select
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                                onChange={handleChangeByTag}
                                 ref={brandRef}
+                                name='brand'
                             >
                                 <option value="all">All Brands</option>
                                 {brands.map(brand => (
@@ -130,8 +167,8 @@ const BrowseCars = () => {
                             <label className="block text-sm font-semibold text-gray-700 mb-2">Price per Day</label>
                             <select
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                                onChange={handleChangeByTag}
                                 ref={priceRef}
+                                name='price'
                             >
                                 <option value="all">All Prices</option>
                                 <option value="0-50">$0 - $50</option>
@@ -145,8 +182,8 @@ const BrowseCars = () => {
                             <label className="block text-sm font-semibold text-gray-700 mb-2">Year</label>
                             <select
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                                onChange={handleChangeByTag}
                                 ref={yearRef}
+                                name='year'
                             >
 
                                 <option value="all">All Years</option>
@@ -164,7 +201,14 @@ const BrowseCars = () => {
                         </div>
 
                         {/* Clear Filters */}
-                        <div className="flex items-end">
+                        <div className="flex items-end gap-3">
+                            <button
+                                className="w-full px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-semibold"
+                                onClick={handleApplyFilter}
+                            >
+                                Apply
+                            </button>
+
                             <button
                                 className="w-full px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-semibold"
                                 onClick={handleClearFilter}
@@ -194,6 +238,7 @@ const BrowseCars = () => {
                             filteredVehicle.map(vehicle => (
                                 <ItemCard
                                     key={vehicle._id}
+                                    id={vehicle._id}
                                     image={vehicle.image}
                                     name={vehicle.name}
                                     brand={vehicle.brand}

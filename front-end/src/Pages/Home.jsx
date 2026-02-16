@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import { useState, useEffect } from 'react'
 import Header from '../Components/Header'
 import ItemCard from '../Components/cards/ItemCard'
 import Footer from '../Components/Footer'
@@ -6,11 +6,24 @@ import TestimonialCard from '../Components/cards/TestimonialCard'
 import LoginForm from '../Components/LoginForm'
 
 const Home = () => {
+  const [vehicles, setvehicles] = useState([])
+
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      let res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/vehicles/getVehicles`, {
+        credentials: "include"
+      })
+
+      let data = await res.json()
+      setvehicles(data.vehicles)
+    }
+    fetchVehicles()
+  }, [])
 
   return (
     <div className='w-full overflow-x-hidden'>
 
-      <Header  currentPage="/"/>
+      <Header currentPage="/" />
 
 
       <section className='w-full relative'>
@@ -196,7 +209,7 @@ const Home = () => {
         <div className="mainContent flex relative z-10  gap-5 w-full mt-30 mr-30 ml-30 p-15">
 
           <div className="left w-[80%]">
-            <video className='rounded-lg ' src="/Videos/Car.mp4"  muted></video>
+            <video className='rounded-lg ' src="/Videos/Car.mp4" muted></video>
           </div>
 
           <div className="right w-full flex flex-col justify-center gap-5">
@@ -291,11 +304,27 @@ const Home = () => {
           </span>
         </div>
 
-        <div className="items flex gap-5">
-          <ItemCard imgSrc="/images/rangRover.svg" title="Rang Rover" owner="Malak Sab" price="412000" />
-          <ItemCard imgSrc="/images/rangRover.svg" title="Rang Rover" owner="Malak Sab" price="412000" />
-          <ItemCard imgSrc="/images/rangRover.svg" title="Rang Rover" owner="Malak Sab" price="412000" />
-          <ItemCard imgSrc="/images/rangRover.svg" title="Rang Rover" owner="Malak Sab" price="412000" />
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+
+            {
+              vehicles.slice(0, 4).map(vehicle => (
+                <ItemCard
+                  key={vehicle._id}
+                  image={vehicle.image}
+                  name={vehicle.name}
+                  brand={vehicle.brand}
+                  model={vehicle.model}
+                  year={vehicle.year}
+                  description={vehicle.description}
+                  rating={vehicle.rating}
+                  reviews={vehicle.reviews}
+                  price={vehicle.price}
+                />
+              ))
+            }
+
+          </div>
         </div>
 
         <div className="buttons flex gap-2">

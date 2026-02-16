@@ -1,9 +1,10 @@
-import {Star, Heart} from 'lucide-react'
+import { Star, Heart } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 const ItemCard = (props) => {
   return (
     <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all overflow-hidden">
-      
+
       <div className="relative h-48 bg-gray-200 overflow-hidden">
         <img
           src={`${import.meta.env.VITE_SERVER_URL}/vehicleImages/${props.image}`}
@@ -16,7 +17,7 @@ const ItemCard = (props) => {
         </button>
       </div>
 
-      
+
       <div className="p-4">
         {/* Name */}
         <h3 className="text-lg font-bold text-gray-800 mb-1">{props.name}</h3>
@@ -50,9 +51,11 @@ const ItemCard = (props) => {
             <p className="text-2xl font-bold text-gray-800">${props.price}</p>
             <p className="text-xs text-gray-600">per day</p>
           </div>
-          <button className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition font-semibold text-sm">
+          <Link
+            to={`/car-detail/${props.id}`}
+            className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition font-semibold text-sm">
             Book Now
-          </button>
+          </Link>
         </div>
       </div>
     </div>
