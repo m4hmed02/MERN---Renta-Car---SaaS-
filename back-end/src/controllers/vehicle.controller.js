@@ -71,3 +71,32 @@ exports.getVehicleById = async (req, res) => {
     }
 
 }
+
+exports.addVehicleRating = async (req, res) => {
+
+    const { id } = req.params
+    const { rating } = req.body
+ 
+    try{
+
+        const vehicle = await vehicleModel.findByIdAndUpdate(
+            {_id: id},
+            {rating: rating},
+            {new: true}
+        )
+
+        console.log(vehicle)
+
+        
+
+    }catch(e){
+
+        console.log('Unable to add Rating ! ', e.message)
+        res.status.json({
+            success: false,
+            message: "Unable to update the rating"
+        })
+
+    }
+
+}

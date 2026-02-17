@@ -8,5 +8,7 @@ router.post('/addVehicle',isLogggedIn, vehicleImagesUpload.single('image'), vehi
 router.get('/getVehicles', vehicleController.getVehicle)
 router.get('/getVehiclesById/:id',isLogggedIn ,vehicleController.getVehicleById)
 
+// router.put('/addRating', isLogggedIn, vehicleController.addVehicleRating)
+
 
 module.exports = router
