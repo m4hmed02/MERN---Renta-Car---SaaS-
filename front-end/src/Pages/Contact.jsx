@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import Header from '../Components/Header'
-import Footer from '../Components/Footer'
+import Header from '../../Components/Header'
+import Footer from '../../Components/Footer'
 import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react'
 
 const Contact = () => {

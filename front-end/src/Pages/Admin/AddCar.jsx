@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import Header from '../Components/Header';
+import Header from '../../Components/Header';
 import { Plus } from 'lucide-react';
-import Footer from '../Components/Footer';
+import Footer from '../../Components/Footer';
 
 const AddCar = () => {
 

@@ -9,7 +9,7 @@ const About = () => {
             <Header />
 
             {/* Hero Section */}
-            <section className="w-full bg-gradient-to-r from-gray-800 to-gray-700 text-white pt-32 pb-20 px-4">
+            <section className="w-full bg-linear-to-r from-gray-800 to-gray-700 text-white pt-32 pb-20 px-4">
                 <div className="max-w-6xl mx-auto text-center">
                     <h1 className="text-5xl font-bold mb-6">About Rental Car</h1>
                     <p className="text-xl text-gray-300 max-w-2xl mx-auto">

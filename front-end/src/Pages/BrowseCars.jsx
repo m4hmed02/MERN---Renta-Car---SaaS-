@@ -1,7 +1,7 @@
-import Header from '../Components/Header'
-import Footer from '../Components/Footer'
+import Header from '../../Components/Header'
+import Footer from '../../Components/Footer'
 import { Search } from 'lucide-react'
-import ItemCard from '../Components/cards/ItemCard'
+import ItemCard from '../../Components/cards/ItemCard'
 import { useState, useEffect, useRef } from 'react'
 
 const BrowseCars = () => {
@@ -102,9 +102,9 @@ const BrowseCars = () => {
     }
 
     const handleClearFilter = () => {
-        if(brandRef.current.value == "all" && yearRef.current.value == "all" && priceRef.current.value == "all"){
+        if (brandRef.current.value == "all" && yearRef.current.value == "all" && priceRef.current.value == "all") {
             return
-        }else{
+        } else {
             brandRef.current.value = "all"
             yearRef.current.value = "all"
             priceRef.current.value = "all"
@@ -116,7 +116,7 @@ const BrowseCars = () => {
             <Header />
 
             {/* Hero Section */}
-            <section className="w-full bg-gradient-to-r from-gray-800 to-gray-700 text-white pt-32 pb-16 px-4">
+            <section className="w-full bg-linear-to-r from-gray-800 to-gray-700 text-white pt-32 pb-16 px-4">
                 <div className="max-w-6xl mx-auto">
                     <h1 className="text-4xl md:text-5xl font-bold mb-4">Browse Our Fleet</h1>
                     <p className="text-gray-300 text-lg">Find the perfect vehicle for your needs</p>
@@ -230,7 +230,7 @@ const BrowseCars = () => {
             </section>
 
             {/* Vehicles Grid */}
-            <section className="w-full px-4 py-12 flex-grow">
+            <section className="w-full px-4 py-12 grow">
                 <div className="max-w-6xl mx-auto">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 

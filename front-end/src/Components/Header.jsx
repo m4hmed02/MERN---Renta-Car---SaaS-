@@ -41,20 +41,36 @@ const Header = () => {
                 <div className="hidden md:flex items-center gap-8">
 
                     <div className="links flex gap-6">
-                        <Link to="/" className="hover:text-gray-300 transition">Home</Link>
-                        <Link to="/about" className="hover:text-gray-300 transition">About</Link>
-                        <Link to="/contact" className="hover:text-gray-300 transition">Contact Us</Link>
-                        <Link to="/browse" className="hover:text-gray-300 transition">Browse Cars</Link>
+
+
                         {
-                            isLoggedIn ?
-                                <Link to="/profile" className="hover:text-gray-300 transition">Profile</Link> : <></>
+                            isLoggedIn && user?.role === 'admin' &&
+                            (<>
+                                <Link to="/admin-dashboard" className="hover:text-gray-300 transition">Dashboard</Link>
+                                <Link to="/addcar" className="hover:text-gray-300 transition">Add Car</Link>
+                                <Link to="/browse" className="hover:text-gray-300 transition">Fleet</Link>
+                                <Link to="#" className="hover:text-gray-300 transition">Bookings</Link>
+                                <Link to="#" className="hover:text-gray-300 transition">Analytics</Link>
+                            </>)
                         }
 
                         {
-                            isLoggedIn && user?.role === "Seller" ?
-                                <Link to="/addcar" className="hover:text-gray-300 transition">Add Car</Link>
-                                : <></>
+                            isLoggedIn && user?.role != 'admin' &&
+                            (<>
+                                <Link to="/" className="hover:text-gray-300 transition">Home</Link>
+                                <Link to="/about" className="hover:text-gray-300 transition">About</Link>
+                                <Link to="/contact" className="hover:text-gray-300 transition">Contact Us</Link>
+                                <Link to="/browse" className="hover:text-gray-300 transition">Browse Cars</Link>
+                            </>)
                         }
+
+                        {
+                            isLoggedIn &&
+                            (
+                                <Link to="/profile" className="hover:text-gray-300 transition">Profile</Link>
+                            )
+                        }
+
                     </div>
 
                 </div>

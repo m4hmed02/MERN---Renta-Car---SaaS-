@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import Header from '../Components/Header'
-import ItemCard from '../Components/cards/ItemCard'
-import Footer from '../Components/Footer'
-import TestimonialCard from '../Components/cards/TestimonialCard'
-import LoginForm from '../Components/LoginForm'
+import Header from '../../Components/Header'
+import ItemCard from '../../Components/cards/ItemCard'
+import Footer from '../../Components/Footer'
+import TestimonialCard from '../../Components/cards/TestimonialCard'
+import LoginForm from '../../Components/LoginForm'
 
 const Home = () => {
   const [vehicles, setvehicles] = useState([])
