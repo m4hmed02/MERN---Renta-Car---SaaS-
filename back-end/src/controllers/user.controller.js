@@ -11,7 +11,7 @@ exports.login = async (req, res) => {
 
     if (!User) return res.status(401).json({ success: false, message: "No User found" })
 
-    const token = jwt.sign({ email: email }, process.env.Jwt_secret)
+    const token = jwt.sign({ email: email, _id: User._id }, process.env.Jwt_secret)
 
     try {
 
@@ -85,7 +85,7 @@ exports.register = (req, res) => {
 
 exports.getUserDetail = async (req, res) => {
 
-    let userData = await userModel.findOne({email: req.user.email})
+    let userData = await userModel.findOne({ email: req.user.email })
 
     res.status(200).json({
         success: true,

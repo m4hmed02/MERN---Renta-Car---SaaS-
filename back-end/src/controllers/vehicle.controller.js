@@ -1,4 +1,5 @@
 const vehicleModel = require('../models/vehicles')
+const vehicleReviewModel = require('../models/vehicleReviews')
 
 exports.addVehicle = async (req, res) => {
 
@@ -54,7 +55,7 @@ exports.getVehicleById = async (req, res) => {
 
     try {
         let vehicle = await vehicleModel.findOne({ _id: id })
-        
+
         res.status(200).json({
             success: true,
             message: "Vehicle Found!",
@@ -76,27 +77,72 @@ exports.addVehicleRating = async (req, res) => {
 
     const { id } = req.params
     const { rating } = req.body
- 
-    try{
+
+    const oldVehicle = await vehicleModel.findOne({ _id: id })
+
+    try {
+
+        if (oldVehicle.rating === rating || oldVehicle.rating > 5 || oldVehicle.rating < 1) {
+            console.log("noting")
+            return res.status(200).json({
+                success: true,
+                message: "Successfully Updated the Vehicle Rating!"
+            })
+        }
 
         const vehicle = await vehicleModel.findByIdAndUpdate(
-            {_id: id},
-            {rating: rating},
-            {new: true}
+            id,
+            { rating: rating },
+            { new: true }
         )
 
-        console.log(vehicle)
-
-        
-
-    }catch(e){
+        res.status(200).json({
+            success: true,
+            message: "Successfully Updated the Vehicle Rating!"
+        })
+    } catch (e) {
 
         console.log('Unable to add Rating ! ', e.message)
-        res.status.json({
+        res.status(400).json({
             success: false,
             message: "Unable to update the rating"
         })
-
     }
+}
 
+
+// for comment section
+exports.addVehicleComment = async (req, res) => {
+
+    const { vehicleId, comment } = req.body
+
+    let userId = req.user._id
+
+    console.log(vehicleId, comment, userId)
+
+    try {
+        let vehicleReview = new vehicleReviewModel({
+            vehicleId,
+            comment,
+            userId
+        })
+
+        await vehicleReview.save()
+
+        res.status(200).json({
+            success: true,
+            message: "Successfully Added the Vehicle Comment!"
+        })
+    } catch (e) {
+        console.log('Unable to add Comment ! ', e.message)
+        res.status(400).json({
+            success: false,
+            message: "Unable to add the comment"
+        })
+    }
+}
+
+exports.getVehicleReviews = (req, res) => {
+    const userId = req.user._id
+    console.log(userId)
 }

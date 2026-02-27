@@ -8,7 +8,7 @@ let isLoggedIn = function (req, res, next) {
             success: false,
             message: "Unsuccessfully! User LogIn"
         })
-    }else{
+    } else {
         let decode = jwt.verify(token, process.env.Jwt_secret)
         req.user = decode
         next()

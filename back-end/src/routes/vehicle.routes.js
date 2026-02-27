@@ -4,11 +4,13 @@ const vehicleController = require('../controllers/vehicle.controller')
 const vehicleImagesUpload = require('../utils/multerConfig')
 const isLogggedIn = require('../middlewares/loginMiddleware')
 
-router.post('/addVehicle',isLogggedIn, vehicleImagesUpload.single('image'), vehicleController.addVehicle)
+router.post('/addVehicle', isLogggedIn, vehicleImagesUpload.single('image'), vehicleController.addVehicle)
 router.get('/getVehicles', vehicleController.getVehicle)
-router.get('/getVehiclesById/:id',isLogggedIn ,vehicleController.getVehicleById)
+router.get('/getVehiclesById/:id', isLogggedIn, vehicleController.getVehicleById)
 
-// router.put('/addRating', isLogggedIn, vehicleController.addVehicleRating)
+router.put('/addRating/:id', isLogggedIn, vehicleController.addVehicleRating)
 
+router.post('/addComment', isLogggedIn, vehicleController.addVehicleComment)
+router.get('/getVehicleReviews', isLogggedIn, vehicleController.getVehicleReviews)
 
 module.exports = router
