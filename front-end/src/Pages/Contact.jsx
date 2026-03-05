@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import Header from '../../Components/Header'
-import Footer from '../../Components/Footer'
+import Header from '../Components/Header'
+import Footer from '../Components/Footer'
 import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react'
 
 const Contact = () => {
@@ -36,7 +36,7 @@ const Contact = () => {
             <Header />
 
             {/* Hero Section */}
-            <section className="w-full bg-gradient-to-r from-gray-800 to-gray-700 text-white pt-32 pb-20 px-4">
+            <section className="w-full bg-linear-to-r from-gray-800 to-gray-700 text-white pt-32 pb-20 px-4">
                 <div className="max-w-6xl mx-auto text-center">
                     <h1 className="text-5xl font-bold mb-6">Get In Touch</h1>
                     <p className="text-xl text-gray-300 max-w-2xl mx-auto">
@@ -195,7 +195,7 @@ const Contact = () => {
                             <div className="space-y-6">
                                 {/* Customer Support */}
                                 <div className="flex gap-4">
-                                    <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center shrink-0">
                                         <Mail className="w-6 h-6 text-white" />
                                     </div>
                                     <div>
@@ -208,7 +208,7 @@ const Contact = () => {
 
                                 {/* Report Issues */}
                                 <div className="flex gap-4">
-                                    <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center shrink-0">
                                         <AlertCircle className="w-6 h-6 text-white" />
                                     </div>
                                     <div>
@@ -221,7 +221,7 @@ const Contact = () => {
 
                                 {/* Business Inquiries */}
                                 <div className="flex gap-4">
-                                    <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center shrink-0">
                                         <Phone className="w-6 h-6 text-white" />
                                     </div>
                                     <div>
@@ -234,7 +234,7 @@ const Contact = () => {
 
                                 {/* Feedback */}
                                 <div className="flex gap-4">
-                                    <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center shrink-0">
                                         <Heart className="w-6 h-6 text-white" />
                                     </div>
                                     <div>

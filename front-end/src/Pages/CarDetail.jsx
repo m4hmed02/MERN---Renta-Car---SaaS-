@@ -1,10 +1,10 @@
 import { useParams } from "react-router-dom"
 import { useEffect, useState } from "react"
-import Header from '../../Components/Header'
-import Footer from '../../Components/Footer'
+import Header from '../Components/Header'
+import Footer from '../Components/Footer'
 import { Star } from "lucide-react"
-import CommentCard from "../../Components/cards/CommentCard"
-import { fetchVehicle, updateVehicleRating, addVehicleComment } from '../../api/CarDetail'
+import CommentCard from "../Components/cards/CommentCard"
+import { fetchVehicle, updateVehicleRating, addVehicleComment } from '../api/CarDetail'
 
 const CarDetail = () => {
 
@@ -26,7 +26,9 @@ const CarDetail = () => {
 
   // This is will be used for updaing vehicle rating
   const handleRating = async (starValue) => {
-    updateVehicleRating(id, starValue)
+    await updateVehicleRating({ id, starValue })
+    const updated = await fetchVehicle(id)
+    setVehicle(updated)
   }
 
 
@@ -40,7 +42,10 @@ const CarDetail = () => {
       alert("Please enter a comment")
       return
     }
-    addVehicleComment(id, comment)
+    await addVehicleComment({ id, comment })
+    const updated = await fetchVehicle(id)
+    setVehicle(updated)
+    setComment("")
   }
 
   return (

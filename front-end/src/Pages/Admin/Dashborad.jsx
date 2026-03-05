@@ -89,7 +89,7 @@ export function Dashboard() {
                             <div className="space-y-4">
 
                                 <div className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors">
-                                    <div className="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                    <div className="shrink-0 w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
                                         <Car className="size-8 text-gray-600" />
                                     </div>
                                     <div className="flex-1">

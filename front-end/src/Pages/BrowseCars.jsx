@@ -1,10 +1,14 @@
-import Header from '../../Components/Header'
-import Footer from '../../Components/Footer'
+import Header from '../Components/Header'
+import Footer from '../Components/Footer'
 import { Search } from 'lucide-react'
-import ItemCard from '../../Components/cards/ItemCard'
+import ItemCard from '../Components/cards/ItemCard'
 import { useState, useEffect, useRef } from 'react'
+import { useContext } from 'react'
+import { AuthContext } from '../context/AuthContext'
 
 const BrowseCars = () => {
+
+    const { user } = useContext(AuthContext)
 
     const [vehicles, setvehicles] = useState([])
     const [filteredVehicle, setfilteredVehicle] = useState([])
@@ -118,8 +122,20 @@ const BrowseCars = () => {
             {/* Hero Section */}
             <section className="w-full bg-linear-to-r from-gray-800 to-gray-700 text-white pt-32 pb-16 px-4">
                 <div className="max-w-6xl mx-auto">
-                    <h1 className="text-4xl md:text-5xl font-bold mb-4">Browse Our Fleet</h1>
-                    <p className="text-gray-300 text-lg">Find the perfect vehicle for your needs</p>
+                    {
+                        user.role === 'admin' ?
+                            (
+                                <h1 className="text-4xl md:text-5xl font-bold mb-4">Manage Your Fleet</h1>
+                            )
+                            :
+                            (
+                                <span>
+                                    <h1 className="text-4xl md:text-5xl font-bold mb-4">Browse Our Fleet</h1>
+                                    <p className="text-gray-300 text-lg">Find the perfect vehicle for your needs</p>
+                                </span>
+                            )
+
+                    }
                 </div>
             </section>
 

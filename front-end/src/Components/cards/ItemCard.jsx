@@ -1,7 +1,14 @@
-import { Star, Heart } from 'lucide-react'
+import { Star, Heart, Trash2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useContext } from 'react'
+import { AuthContext } from '../../context/AuthContext'
+
 
 const ItemCard = (props) => {
+
+  const { user } = useContext(AuthContext)
+
+
   return (
     <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all overflow-hidden">
 
@@ -51,11 +58,27 @@ const ItemCard = (props) => {
             <p className="text-2xl font-bold text-gray-800">${props.price}</p>
             <p className="text-xs text-gray-600">per day</p>
           </div>
-          <Link
-            to={`/car-detail/${props.id}`}
-            className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition font-semibold text-sm">
-            Book Now
-          </Link>
+
+          {
+            user.role === 'admin' ?
+              <span className='flex items-center gap-3' >
+
+                <Trash2 size={24} className='text-red-600 hover:text-red-800 cursor-pointer transition' />
+
+                <button
+                  className="px-4 py-2 bg-green-700 text-white rounded-lg hover:bg-green-900 transition font-semibold text-sm">
+                  Mark as Rented
+                </button>
+
+              </span>
+              :
+              <Link
+                to={`/car-detail/${props.id}`}
+                className="px-4 py-2 bg-green-700 text-white rounded-lg hover:bg-green-900 transition font-semibold text-sm">
+                Book Now
+              </Link>
+
+          }
         </div>
       </div>
     </div>
