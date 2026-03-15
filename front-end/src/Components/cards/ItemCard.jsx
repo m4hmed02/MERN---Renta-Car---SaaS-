@@ -12,6 +12,8 @@ const ItemCard = (props) => {
   return (
     <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all overflow-hidden">
 
+      {console.log(props)}
+
       <div className="relative h-48 bg-gray-200 overflow-hidden">
         <img
           src={`${import.meta.env.VITE_SERVER_URL}/vehicleImages/${props.image}`}
@@ -49,7 +51,7 @@ const ItemCard = (props) => {
               />
             ))}
           </div>
-          <span className="text-sm text-gray-600">({props.reviews})</span>
+          <span className="text-sm text-gray-600">({props.rating})</span>
         </div>
 
         {/* Price and Button */}

@@ -311,6 +311,7 @@ const Home = () => {
               vehicles.slice(0, 4).map(vehicle => (
                 <ItemCard
                   key={vehicle._id}
+                  id={vehicle._id}
                   image={vehicle.image}
                   name={vehicle.name}
                   brand={vehicle.brand}

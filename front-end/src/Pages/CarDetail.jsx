@@ -4,31 +4,54 @@ import Header from '../Components/Header'
 import Footer from '../Components/Footer'
 import { Star } from "lucide-react"
 import CommentCard from "../Components/cards/CommentCard"
-import { fetchVehicle, updateVehicleRating, addVehicleComment } from '../api/CarDetail'
 
 const CarDetail = () => {
 
   const { id } = useParams()
 
-  const [vehicle, setVehicle] = useState([])
-  const [commentList, setCommentList] = useState([])
+  const [vehicle, setVehicle] = useState({})
   const [comment, setComment] = useState("")
-
+  const [reviews, setreviews] = useState([])
 
   useEffect(() => {
-    const getVehicle = async () => {
-      const data = await fetchVehicle(id);
-      setVehicle(data);
+    const fetchVehicle = async () => {
+      let res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/vehicles/getVehiclesById/${id}`, {
+        credentials: 'include'
+      })
+
+      let result = await res.json()
+      setVehicle(result.data)
     }
 
-    getVehicle();
+    const fetchReviews = async () => {
+      let res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/vehicles/getVehicleReviews/${id}`, {
+        credentials: 'include'
+      })
+
+      let result = await res.json()
+      setreviews(result.reviews)
+      console.log(result.reviews)
+    }
+
+    fetchVehicle();
+    fetchReviews()
   }, [id]);
 
   // This is will be used for updaing vehicle rating
   const handleRating = async (starValue) => {
-    await updateVehicleRating({ id, starValue })
-    const updated = await fetchVehicle(id)
-    setVehicle(updated)
+    let res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/vehicles/addRating/${id}`, {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        rating: starValue
+      })
+    })
+
+    let result = await res.json()
+    console.log(result)
   }
 
 
@@ -42,9 +65,20 @@ const CarDetail = () => {
       alert("Please enter a comment")
       return
     }
-    await addVehicleComment({ id, comment })
-    const updated = await fetchVehicle(id)
-    setVehicle(updated)
+    let res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/vehicles/addComment`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        vehicleId: id,
+        comment
+      })
+    })
+
+    let result = await res.json()
+    console.log(result)
     setComment("")
   }
 
@@ -187,7 +221,17 @@ const CarDetail = () => {
           {/* Comments List */}
           <div className="flex flex-col gap-5">
 
-            <CommentCard />
+            {
+              reviews.map((review) => (
+                <CommentCard
+                  key={review._id}
+                  comment={review.comment}
+                  time={review.createdAt}
+                  userId={review.userId}
+                />
+              ))
+            }
+
 
           </div>
         </div>

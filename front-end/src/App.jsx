@@ -14,6 +14,7 @@ import { Dashboard } from "./Pages/Admin/Dashborad"
 import { AuthProvider } from "./context/AuthContext"
 
 import ProtectedRoutes from "./Components/ProtectedRoutes"
+import Checkout from "./Pages/Checkout"
 
 function App() {
 
@@ -52,12 +53,20 @@ function App() {
           }
           />
 
+          <Route path="/checkout" element={
+            <ProtectedRoutes>
+              <Checkout />
+            </ProtectedRoutes>
+          }
+          />
+
           <Route path="/admin-dashboard" element={
             <ProtectedRoutes>
               <Dashboard />
             </ProtectedRoutes>
           }
           />
+
 
         </Routes>
 
