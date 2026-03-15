@@ -1,5 +1,6 @@
 const vehicleModel = require('../models/vehicles')
 const vehicleReviewModel = require('../models/vehicleReviews')
+const vehicleReviews = require('../models/vehicleReviews')
 
 exports.addVehicle = async (req, res) => {
 
@@ -74,25 +75,36 @@ exports.getVehicleById = async (req, res) => {
 }
 
 exports.addVehicleRating = async (req, res) => {
-
     const { id } = req.params
-    const { rating } = req.body
-
-    const oldVehicle = await vehicleModel.findOne({ _id: id })
+    const ratingNum = Number(req.body.rating)
 
     try {
-
-        if (oldVehicle.rating === rating || oldVehicle.rating > 5 || oldVehicle.rating < 1) {
-            console.log("noting")
-            return res.status(200).json({
-                success: true,
-                message: "Successfully Updated the Vehicle Rating!"
+        if (isNaN(ratingNum) || ratingNum > 5 || ratingNum < 1) {
+            return res.status(400).json({
+                success: false,
+                message: "Rating must be a number between 1 and 5!"
             })
         }
 
-        const vehicle = await vehicleModel.findByIdAndUpdate(
+        const oldVehicle = await vehicleModel.findOne({ _id: id })
+
+        if (!oldVehicle) {
+            return res.status(404).json({
+                success: false,
+                message: "Vehicle not found!"
+            })
+        }
+
+        if (oldVehicle.rating === ratingNum) {
+            return res.status(200).json({
+                success: true,
+                message: "Rating is already set to this value!"
+            })
+        }
+
+        await vehicleModel.findByIdAndUpdate(
             id,
-            { rating: rating },
+            { rating: ratingNum },
             { new: true }
         )
 
@@ -101,14 +113,14 @@ exports.addVehicleRating = async (req, res) => {
             message: "Successfully Updated the Vehicle Rating!"
         })
     } catch (e) {
-
-        console.log('Unable to add Rating ! ', e.message)
-        res.status(400).json({
+        console.log('Unable to add Rating!', e.message)
+        res.status(500).json({
             success: false,
             message: "Unable to update the rating"
         })
     }
 }
+
 
 
 // for comment section
@@ -142,7 +154,26 @@ exports.addVehicleComment = async (req, res) => {
     }
 }
 
-exports.getVehicleReviews = (req, res) => {
+// this will be used to get the vehicle reviewss
+exports.getVehicleReviews = async (req, res) => {
     const userId = req.user._id
-    console.log(userId)
+    const { id } = req.params
+
+    try {
+        let vehicleReviews = await vehicleReviewModel.find({ vehicleId: id })
+
+        if (!vehicleReviews) return
+        res.status(200).json({
+            success: true,
+            reviews: vehicleReviews,
+            message: "Successfully Fethced Reviews!"
+        })
+
+    } catch (e) {
+        res.status(400).json({
+            success: false,
+            message: "Unsuccessfully Fethced Reviews!"
+        })
+    }
+
 }

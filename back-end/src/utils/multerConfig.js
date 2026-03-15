@@ -30,7 +30,5 @@ const vehicleImageStorage = multer.diskStorage({
 })
 const vehicleImagesUpload = multer({storage: vehicleImageStorage})
 
-// export upload variable
-module.exports = avatarUpload
-
-module.exports = vehicleImagesUpload
+// export upload variables
+module.exports = { avatarUpload, vehicleImagesUpload }

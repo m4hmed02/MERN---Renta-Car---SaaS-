@@ -92,3 +92,29 @@ exports.getUserDetail = async (req, res) => {
         userData
     })
 }
+exports.getUserById = async (req, res) => {
+
+    const { id } = req.params
+    console.log("yes found")
+
+    try {
+        let user = await userModel.findOne({ _id: id })
+
+        console.log("user found")
+
+
+        res.status(200).json({
+            success: true,
+            message: "user found!",
+            userData: user
+        })
+
+
+    } catch (e) {
+
+        res.status(400).json({
+            success: false,
+            message: "User Not found"
+        })
+    }
+}
