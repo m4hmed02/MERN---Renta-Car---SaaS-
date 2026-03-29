@@ -1,5 +1,5 @@
 const Stripe = require('stripe')
-const stripe = new Stripe(process.env.STRIPE_SECERET_KEY)
+const stripe = () => new Stripe(process.env.STRIPE_SECRET_KEY)
 const bookingModel = require('../models/booking')
 
 exports.createPaymentIntent = async (req, res) => {
@@ -8,6 +8,10 @@ exports.createPaymentIntent = async (req, res) => {
         const { bookingId } = req.body
 
         const booking = await bookingModel.findById(bookingId)
+
+        // Yeh line add karo temporarily
+        console.log('Booking:', booking)
+        console.log('req.user:', req.user)
 
         if (!booking) {
             return res.status(404).json({
@@ -30,12 +34,12 @@ exports.createPaymentIntent = async (req, res) => {
             })
         }
 
-        const paymentIntent = await stripe.paymentIntent.create({
-            ammount: booking.totalPrice * 100, // doller to cents
+        const paymentIntent = await stripe().paymentIntents.create({
+            amount: booking.totalPrice * 100, // doller to cents
             currency: 'usd',
             metadata: {
                 bookingId,
-                userId: req.user.id.toString()
+                userId: req.user._id.toString()
             }
         })
 
@@ -44,6 +48,42 @@ exports.createPaymentIntent = async (req, res) => {
             clientSecret: paymentIntent.client_secret
         })
 
+    } catch (e) {
+        res.status(500).json({
+            success: false,
+            message: e.message
+        })
+    }
+}
+
+exports.confirmPayment = async (req, res) => {
+    try {
+        const { bookingId, paymentIntentId } = req.body
+
+        const paymentIntent = await stripe().paymentIntents.retrieve(paymentIntentId)
+
+        if (paymentIntent.status !== 'succeeded') {
+            return res.status(400).json({
+                success: false,
+                message: 'Payment not successfull'
+            })
+        }
+
+        const updatedBooking = await bookingModel.findByIdAndUpdate(
+            bookingId,
+            {
+                status: 'paid',
+                paymentIntentId: paymentIntentId,
+                paidAt: new Date()
+            },
+            { new: true }
+
+        )
+        res.status(200).json({
+            success: true,
+            message: 'Payment confirmed! Booking is paid.',
+            booking: updatedBooking
+        })
     } catch (e) {
         res.status(500).json({
             success: false,
