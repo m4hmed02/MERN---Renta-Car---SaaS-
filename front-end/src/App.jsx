@@ -15,6 +15,7 @@ import { AuthProvider } from "./context/AuthContext"
 
 import ProtectedRoutes from "./Components/ProtectedRoutes"
 import Checkout from "./Pages/Checkout"
+import Cart from "./Pages/Cart"
 
 function App() {
 
@@ -53,12 +54,6 @@ function App() {
           }
           />
 
-          <Route path="/checkout" element={
-            <ProtectedRoutes>
-              <Checkout />
-            </ProtectedRoutes>
-          }
-          />
 
           <Route path="/admin-dashboard" element={
             <ProtectedRoutes>
@@ -67,6 +62,19 @@ function App() {
           }
           />
 
+          <Route path="/checkout/:bookingId" element={
+            <ProtectedRoutes>
+              <Checkout />
+            </ProtectedRoutes>
+          }
+          />
+
+          <Route path="/cart" element={
+            <ProtectedRoutes>
+              <Cart />
+            </ProtectedRoutes>
+          }
+          />
 
         </Routes>
 

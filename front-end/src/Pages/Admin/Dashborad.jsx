@@ -1,21 +1,81 @@
+import { useEffect, useState, useContext } from 'react';
 import { Car, Calendar, DollarSign, Users, TrendingUp, AlertCircle, Package } from 'lucide-react';
 import Header from '../../Components/Header';
 import Footer from '../../Components/Footer';
+import { AuthContext } from '../../context/AuthContext';
 
 export function Dashboard() {
+    const { user } = useContext(AuthContext);
+    const [bookings, setBookings] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchBookings();
+    }, []);
+
+    const fetchBookings = async () => {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/bookings/all`, {
+                credentials: 'include'
+            });
+            const data = await res.json();
+            if (data.success) {
+                setBookings(data.bookings);
+            }
+        } catch (error) {
+            console.error("Failed to fetch bookings:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const updateStatus = async (id, status) => {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/bookings/${id}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ status })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setBookings(bookings.map(b => b._id === id ? { ...b, status: data.booking.status } : b));
+            } else {
+                alert(data.message || 'Failed to update status');
+            }
+        } catch (error) {
+            console.error("Failed to update status", error);
+            alert('Error updating status');
+        }
+    };
+
+    // Calculate Dynamic Stats
+    const pendingBookings = bookings.filter(b => b.status === 'pending').length;
+    const activeBookings = bookings.filter(b => b.status === 'approved' || b.status === 'paid').length;
+    const totalRevenue = bookings.filter(b => b.status === 'paid').reduce((sum, b) => sum + (b.totalPrice || 0), 0);
+
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'pending': return 'bg-orange-100 text-orange-700';
+            case 'approved': return 'bg-blue-100 text-blue-700';
+            case 'paid': return 'bg-green-100 text-green-700';
+            case 'cancelled': return 'bg-red-100 text-red-700';
+            default: return 'bg-gray-100 text-gray-700';
+        }
+    };
+
     return (
         <>
-
             <Header />
             <div className="relative top-25 min-h-screen bg-linear-to-br from-gray-50 to-gray-100 py-8 px-4">
                 <div className="max-w-7xl mx-auto">
 
                     <div className="mb-8">
                         <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                            Welcome back, Ahmed! 👋
+                            Welcome back, {user?.name || 'Admin'}! 👋
                         </h1>
                         <p className="text-gray-600">
-                            Ahmed Rentals • PRO Plan
+                            Dashboard Overview • PRO Plan
                         </p>
                     </div>
 
@@ -42,8 +102,8 @@ export function Dashboard() {
                                 <span className="text-sm text-green-600 font-semibold">+8%</span>
                             </div>
                             <h3 className="text-gray-600 text-sm font-medium mb-1">Active Bookings</h3>
-                            <p className="text-3xl font-bold text-gray-900">12</p>
-                            <p className="text-xs text-gray-500 mt-2">3 pending approval</p>
+                            <p className="text-3xl font-bold text-gray-900">{activeBookings}</p>
+                            <p className="text-xs text-gray-500 mt-2">{pendingBookings} pending approval</p>
                         </div>
 
                         <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-purple-500">
@@ -53,9 +113,9 @@ export function Dashboard() {
                                 </div>
                                 <span className="text-sm text-green-600 font-semibold">+23%</span>
                             </div>
-                            <h3 className="text-gray-600 text-sm font-medium mb-1">Monthly Revenue</h3>
-                            <p className="text-3xl font-bold text-gray-900">$8,500</p>
-                            <p className="text-xs text-gray-500 mt-2">Total: $12,000</p>
+                            <h3 className="text-gray-600 text-sm font-medium mb-1">Total Revenue</h3>
+                            <p className="text-3xl font-bold text-gray-900">${totalRevenue}</p>
+                            <p className="text-xs text-gray-500 mt-2">Based on paid bookings</p>
                         </div>
 
                         <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-amber-500">
@@ -79,7 +139,7 @@ export function Dashboard() {
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                                     <Calendar className="size-5" />
-                                    Recent Bookings
+                                    Booking Management
                                 </h2>
                                 <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
                                     View All
@@ -87,24 +147,59 @@ export function Dashboard() {
                             </div>
 
                             <div className="space-y-4">
-
-                                <div className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors">
-                                    <div className="shrink-0 w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-                                        <Car className="size-8 text-gray-600" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <h3 className="font-semibold text-gray-900">Toyota Corolla</h3>
-                                        <p className="text-sm text-gray-600">John Doe</p>
-                                        <p className="text-xs text-gray-500">Mar 10 - Mar 15</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="font-semibold text-gray-900">$450</p>
-                                        <span className="inline-block px-2 py-1 rounded-full text-xs font-medium mt-1 bg-green-100 text-green-700">
-                                            confirmed
-                                        </span>
-                                    </div>
-                                </div>
-
+                                {loading ? (
+                                    <div className="text-center py-8 text-gray-500">Loading bookings...</div>
+                                ) : bookings.length === 0 ? (
+                                    <div className="text-center py-8 text-gray-500 border border-dashed rounded-lg">No bookings found.</div>
+                                ) : (
+                                    bookings.slice().reverse().map((booking) => (
+                                        <div key={booking._id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors">
+                                            <div className="flex items-center gap-4">
+                                                <div className="shrink-0 w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+                                                    {booking.vehicle?.image ? (
+                                                        <img src={`${import.meta.env.VITE_SERVER_URL}/vehicleImages/${booking.vehicle.image}`} alt="car" className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <Car className="size-8 text-gray-600" />
+                                                    )}
+                                                </div>
+                                                <div className="flex-1">
+                                                    <h3 className="font-semibold text-gray-900">{booking.vehicle?.name || 'Unknown Vehicle'}</h3>
+                                                    <p className="text-sm text-gray-600">{booking.user?.name || booking.user?.email || 'Unknown User'}</p>
+                                                    <p className="text-xs text-gray-500">
+                                                        {new Date(booking.startDate).toLocaleDateString()} - {new Date(booking.endDate).toLocaleDateString()}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="flex flex-col sm:items-end gap-2 shrink-0">
+                                                <div className="flex items-center gap-3">
+                                                    <p className="font-semibold text-gray-900">${booking.totalPrice}</p>
+                                                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${getStatusColor(booking.status)}`}>
+                                                        {booking.status}
+                                                    </span>
+                                                </div>
+                                                
+                                                {/* Admin Actions */}
+                                                {booking.status === 'pending' && (
+                                                    <div className="flex gap-2">
+                                                        <button 
+                                                            onClick={() => updateStatus(booking._id, 'approved')}
+                                                            className="px-3 py-1.5 bg-green-500 text-white rounded-md text-xs font-bold hover:bg-green-600 transition-colors shadow-sm"
+                                                        >
+                                                            Approve
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => updateStatus(booking._id, 'cancelled')}
+                                                            className="px-3 py-1.5 bg-red-500 text-white rounded-md text-xs font-bold hover:bg-red-600 transition-colors shadow-sm"
+                                                        >
+                                                            Reject
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
                             </div>
                         </div>
 
@@ -115,7 +210,7 @@ export function Dashboard() {
                             <div className="bg-white rounded-2xl shadow-lg p-6">
                                 <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
                                 <div className="space-y-3">
-                                    <button className="w-full flex items-center gap-3 p-3 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition-colors">
+                                    <button onClick={() => window.location.href='/addcar'} className="w-full flex items-center gap-3 p-3 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition-colors cursor-pointer">
                                         <Package className="size-5" />
                                         Add New Vehicle
                                     </button>
@@ -137,13 +232,15 @@ export function Dashboard() {
                                     <h3 className="font-bold text-gray-900">Alerts</h3>
                                 </div>
                                 <div className="space-y-3">
+                                    {pendingBookings > 0 && (
+                                        <div className="bg-white/90 p-3 rounded-lg shadow-sm border border-red-100">
+                                            <p className="text-sm font-bold text-red-600">{pendingBookings} pending bookings</p>
+                                            <p className="text-xs text-gray-600 mt-1">Requires your immediate approval</p>
+                                        </div>
+                                    )}
                                     <div className="bg-white/80 p-3 rounded-lg">
                                         <p className="text-sm font-medium text-gray-900">2 vehicles need maintenance</p>
                                         <p className="text-xs text-gray-600 mt-1">Schedule service soon</p>
-                                    </div>
-                                    <div className="bg-white/80 p-3 rounded-lg">
-                                        <p className="text-sm font-medium text-gray-900">3 pending bookings</p>
-                                        <p className="text-xs text-gray-600 mt-1">Requires your approval</p>
                                     </div>
                                 </div>
                             </div>

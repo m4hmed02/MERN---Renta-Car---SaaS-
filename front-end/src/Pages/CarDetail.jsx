@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
 import Header from '../Components/Header'
 import Footer from '../Components/Footer'
@@ -8,10 +8,16 @@ import CommentCard from "../Components/cards/CommentCard"
 const CarDetail = () => {
 
   const { id } = useParams()
+  const navigate = useNavigate()
 
   const [vehicle, setVehicle] = useState({})
   const [comment, setComment] = useState("")
   const [reviews, setreviews] = useState([])
+  
+  const [startDate, setStartDate] = useState("")
+  const [endDate, setEndDate] = useState("")
+  const [error, setError] = useState(null)
+  const [bookingLoading, setBookingLoading] = useState(false)
 
   useEffect(() => {
     const fetchVehicle = async () => {
@@ -82,6 +88,45 @@ const CarDetail = () => {
     setComment("")
   }
 
+  const handleBookingSubmit = async () => {
+    setError(null);
+    if (!startDate || !endDate) {
+      setError('Please select both start and end dates.');
+      return;
+    }
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    if (start >= end) {
+      setError('End date must be after start date.');
+      return;
+    }
+
+    setBookingLoading(true);
+    try {
+      const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/bookings/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          vehicleId: id,
+          startDate,
+          endDate
+        })
+      });
+      
+      const result = await res.json();
+      if (result.success) {
+        navigate('/cart');
+      } else {
+        setError(result.message || 'Failed to create booking');
+      }
+    } catch (err) {
+      setError('An error occurred while booking');
+    } finally {
+      setBookingLoading(false);
+    }
+  }
+
   return (
     <>
       <Header />
@@ -131,8 +176,27 @@ const CarDetail = () => {
               </p>
             </div>
 
-            <button className="px-8 py-3 sm:py-4 bg-linear-to-r from-gray-900 to-black text-white rounded-lg font-bold text-base sm:text-lg cursor-pointer transition-all duration-300 uppercase tracking-wider hover:shadow-lg hover:-translate-y-1 active:translate-y-0">
-              Book Now
+            {/* Booking Dates Form */}
+            <div className="flex flex-col gap-4 mt-2">
+              <h3 className="font-bold text-gray-900 text-lg">Select Rental Dates</h3>
+              {error && <div className="text-red-500 text-sm font-semibold">{error}</div>}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Start Date</label>
+                  <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">End Date</label>
+                  <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black" />
+                </div>
+              </div>
+            </div>
+
+            <button 
+              onClick={handleBookingSubmit}
+              disabled={bookingLoading}
+              className="px-8 py-3 sm:py-4 bg-linear-to-r from-gray-900 to-black text-white rounded-lg font-bold text-base sm:text-lg cursor-pointer transition-all duration-300 uppercase tracking-wider hover:shadow-lg disabled:opacity-50 hover:-translate-y-1 active:translate-y-0">
+              {bookingLoading ? 'Requesting...' : 'Add to Cart / Book Now'}
             </button>
           </div>
         </div>

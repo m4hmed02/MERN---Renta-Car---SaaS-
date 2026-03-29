@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom"
 import { useState, useContext } from "react"
 import { AuthContext } from "../context/AuthContext"
-import { Menu, X } from "lucide-react"
+import { Menu, X, ShoppingCart } from "lucide-react"
 
 const Header = () => {
 
@@ -75,9 +75,14 @@ const Header = () => {
                 </div>
 
                 {/* Right Section - Desktop */}
-                <div className="hidden md:flex items-center">
+                <div className="hidden md:flex items-center gap-4">
                     {
                         isLoggedIn ? (
+                            <>
+                            <Link to="/cart" className="relative text-white hover:text-gray-300 transition p-2 bg-white/10 rounded-full hover:bg-white/20">
+                                <ShoppingCart className="w-5 h-5" />
+                            </Link>
+
                             <div className="relative">
                                 <button
                                     onClick={handleProfileDropdown}
@@ -127,6 +132,7 @@ const Header = () => {
                                     </div>
                                 )}
                             </div>
+                            </>
                         ) : (
                             <button className="flex items-center gap-1 border border-white rounded-lg px-3 py-2 cursor-pointer hover:bg-white/15 transition">
                                 <img src="/profile.svg" alt="Sign In" className="w-4 h-4" />
@@ -139,6 +145,11 @@ const Header = () => {
                 {/* Mobile Menu Toggle */}
                 <div className="md:hidden flex items-center gap-4">
                     {isLoggedIn && (
+                        <>
+                        <Link to="/cart" className="text-white hover:text-gray-300 transition p-1.5 bg-white/10 rounded-full hover:bg-white/20">
+                            <ShoppingCart className="w-5 h-5" />
+                        </Link>
+
                         <div className="relative">
                             <button
                                 onClick={handleProfileDropdown}
@@ -187,6 +198,7 @@ const Header = () => {
                                 </div>
                             )}
                         </div>
+                        </>
                     )}
 
                     <button

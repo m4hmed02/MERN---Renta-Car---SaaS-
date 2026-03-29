@@ -1,211 +1,259 @@
-import React from 'react'
-import Header from '../Components/Header'
-import Footer from '../Components/Footer'
-import { CreditCard, Calendar, ShieldCheck } from 'lucide-react'
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import Header from '../Components/Header';
+import Footer from '../Components/Footer';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+
+// Load Stripe outside of components to avoid recreating Stripe object on every render.
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_placeholder');
+
+// Stripe Payment Form Component
+const PaymentForm = ({ booking, onSuccess }) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [error, setError] = useState(null);
+  const [processing, setProcessing] = useState(false);
+  const [clientSecret, setClientSecret] = useState('');
+
+  useEffect(() => {
+    const fetchClientSecret = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/payment/create-intent`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ bookingId: booking._id })
+        });
+        const data = await res.json();
+        if (data.success) {
+          setClientSecret(data.clientSecret);
+        } else {
+          setError(data.message || 'Failed to initialize payment');
+        }
+      } catch (err) {
+        setError('An error occurred initializing payment.');
+      }
+    };
+    fetchClientSecret();
+  }, [booking._id]);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (!stripe || !elements || !clientSecret) return;
+
+    setProcessing(true);
+    setError(null);
+
+    const cardElement = elements.getElement(CardElement);
+
+    const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: { card: cardElement }
+    });
+
+    if (stripeError) {
+      setError(stripeError.message);
+      setProcessing(false);
+    } else if (paymentIntent.status === 'succeeded') {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/payment/confirm`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            bookingId: booking._id,
+            paymentIntentId: paymentIntent.id
+          })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          onSuccess(data.booking);
+        } else {
+          setError(data.message || 'Payment confirmation failed');
+        }
+      } catch (err) {
+        setError('Error confirming payment with server');
+      }
+      setProcessing(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
+      <h3 className="text-xl font-bold text-gray-800">Enter Payment Details</h3>
+      <div className="p-4 border border-gray-300 rounded-lg bg-gray-50">
+        <CardElement options={{
+          style: {
+            base: {
+              fontSize: '16px',
+              color: '#424770',
+              '::placeholder': { color: '#aab7c4' },
+            },
+            invalid: { color: '#9e2146' },
+          },
+        }} />
+      </div>
+      {error && <div className="text-red-500 text-sm font-semibold">{error}</div>}
+      <button 
+        type="submit" 
+        disabled={!stripe || processing || !clientSecret}
+        className="px-8 py-4 bg-linear-to-r from-gray-900 to-black text-white rounded-lg font-bold text-lg cursor-pointer transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {processing ? 'Processing...' : `Pay $${booking.totalPrice}`}
+      </button>
+    </form>
+  );
+};
 
 const Checkout = () => {
+  const { bookingId } = useParams();
+  const navigate = useNavigate();
+
+  const [booking, setBooking] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchBookingDetails = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/bookings/my-booking`, {
+          credentials: 'include'
+        });
+        const result = await res.json();
+        if (result.success) {
+          const foundBooking = result.bookings.find(b => b._id === bookingId);
+          if (foundBooking) {
+            setBooking(foundBooking);
+          } else {
+            setError('Booking not found in your account.');
+          }
+        } else {
+          setError('Failed to fetch bookings');
+        }
+      } catch (err) {
+        setError('Error connecting to the server.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBookingDetails();
+  }, [bookingId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-xl font-bold">Loading Checkout...</p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!booking) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-xl text-red-500 font-bold">{error || "Booking not found"}</p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  const { vehicle } = booking;
+
   return (
     <>
       <Header />
-      <div className="bg-gray-50 min-h-screen py-10 sm:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto px-4 lg:px-6 bg-gray-50 min-h-screen py-24 sm:py-32">
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
           
-          <div className="mb-8">
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">Checkout</h1>
-            <p className="text-gray-500 mt-2 text-sm sm:text-base">Complete your booking securely below.</p>
-          </div>
-
-          <div className="flex flex-col lg:flex-row gap-8 xl:gap-12">
-            
-            {/* Left Column: Billing & Payment */}
-            <div className="w-full lg:w-2/3 space-y-8">
-              
-              {/* Personal Details Form */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
-                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <span className="bg-black text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
-                  Personal Details
-                </h2>
-                <form className="grid grid-cols-1 sm:grid-cols-2 gap-5" onSubmit={e => e.preventDefault()}>
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-semibold text-gray-700">First Name</label>
-                    <input type="text" placeholder="John" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-semibold text-gray-700">Last Name</label>
-                    <input type="text" placeholder="Doe" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all" />
-                  </div>
-                  <div className="space-y-1.5 sm:col-span-2">
-                    <label className="text-sm font-semibold text-gray-700">Email Address</label>
-                    <input type="email" placeholder="john@example.com" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-semibold text-gray-700">Phone Number</label>
-                    <input type="tel" placeholder="+1 (555) 000-0000" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-semibold text-gray-700">City</label>
-                    <input type="text" placeholder="New York" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all" />
-                  </div>
-                  <div className="space-y-1.5 sm:col-span-2">
-                    <label className="text-sm font-semibold text-gray-700">Address Line</label>
-                    <input type="text" placeholder="123 Main Street, Apt 4B" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all" />
-                  </div>
-                </form>
-              </div>
-
-              {/* Booking Details */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
-                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <span className="bg-black text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
-                  Booking Details
-                </h2>
+          <div className="grid md:grid-cols-2">
+            {/* Left side: Booking Summary */}
+            <div className="bg-gray-900 text-white p-8 flex flex-col justify-between">
+              <div>
+                <h2 className="text-2xl font-bold mb-2">Final Checkout</h2>
+                <p className="text-gray-400 mb-8">Secure your rental booking.</p>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div className="p-4 border border-gray-200 rounded-xl bg-gray-50 flex items-start gap-4">
-                    <Calendar className="text-gray-400 mt-1 w-6 h-6" />
-                    <div>
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Pick-up Date</p>
-                      <p className="font-bold text-gray-900 mt-1">Oct 24, 2026</p>
-                      <p className="text-sm text-gray-600">10:00 AM</p>
-                    </div>
-                  </div>
-                  <div className="p-4 border border-gray-200 rounded-xl bg-gray-50 flex items-start gap-4">
-                    <Calendar className="text-gray-400 mt-1 w-6 h-6" />
-                    <div>
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Drop-off Date</p>
-                      <p className="font-bold text-gray-900 mt-1">Oct 27, 2026</p>
-                      <p className="text-sm text-gray-600">10:00 AM</p>
-                    </div>
-                  </div>
+                <div className="w-full h-48 bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center mb-6">
+                   {vehicle?.image ? (
+                     <img src={`${import.meta.env.VITE_SERVER_URL}/vehicleImages/${vehicle.image}`} alt={vehicle.name} className="w-full h-full object-cover" />
+                   ) : (
+                     <span className="text-gray-500">No Image</span>
+                   )}
                 </div>
+                
+                <h3 className="text-2xl font-bold mb-1">{vehicle?.name || 'Vehicle'}</h3>
+                <p className="text-gray-400 mb-8">{new Date(booking.startDate).toLocaleDateString()} to {new Date(booking.endDate).toLocaleDateString()}</p>
               </div>
 
-              {/* Payment Method */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
-                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <span className="bg-black text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
-                  Payment Method
-                </h2>
-
-                <div className="space-y-4">
-                  {/* Credit Card Option */}
-                  <label className="flex items-center justify-between p-4 border-2 border-black rounded-xl cursor-pointer bg-gray-50 transition-all">
-                    <div className="flex items-center gap-3">
-                      <input type="radio" name="payment" defaultChecked className="w-5 h-5 accent-black cursor-pointer" />
-                      <span className="font-semibold text-gray-900">Credit Card</span>
-                    </div>
-                    <CreditCard className="text-gray-700 w-6 h-6" />
-                  </label>
-
-                  {/* PayPal Option */}
-                  <label className="flex items-center justify-between p-4 border-2 border-transparent hover:border-gray-200 rounded-xl cursor-pointer bg-white transition-all">
-                    <div className="flex items-center gap-3">
-                      <input type="radio" name="payment" className="w-5 h-5 accent-black cursor-pointer" />
-                      <span className="font-semibold text-gray-600">PayPal</span>
-                    </div>
-                    <span className="font-bold text-blue-800 italic text-xl">PayPal</span>
-                  </label>
-                </div>
-
-                {/* Card Details Form (mock) */}
-                <div className="mt-6 space-y-5 border-t border-gray-100 pt-6">
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-semibold text-gray-700">Card Number</label>
-                    <div className="relative">
-                      <input type="text" placeholder="0000 0000 0000 0000" className="w-full p-3 pl-10 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all font-mono" />
-                      <CreditCard className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-5">
-                    <div className="space-y-1.5">
-                      <label className="text-sm font-semibold text-gray-700">Expiration Date</label>
-                      <input type="text" placeholder="MM/YY" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all font-mono" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-sm font-semibold text-gray-700">CVC</label>
-                      <input type="text" placeholder="123" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all font-mono" />
-                    </div>
-                  </div>
-                </div>
-
+              <div className="flex justify-between items-center py-4 border-t border-gray-700 mt-auto">
+                <span className="text-white font-bold text-xl">Total Output</span>
+                <span className="font-bold text-3xl text-green-400">${booking.totalPrice}</span>
               </div>
-
             </div>
 
-            {/* Right Column: Order Summary */}
-            <div className="w-full lg:w-1/3">
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8 sticky top-8">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Order Summary</h2>
-
-                {/* Car Preview (Mock) */}
-                <div className="flex gap-4 items-center pb-6 border-b border-gray-100 mb-6">
-                  <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden shrink-0 border border-gray-200">
-                    <div className="w-full h-full bg-gray-200 flex items-center justify-center text-xs text-gray-500 text-center p-2">
-                       Car Image
+            {/* Right side: Payment Area */}
+            <div className="p-8">
+              {booking.status === 'approved' ? (
+                // State 3: Approved / Pay Now
+                <div className="flex flex-col h-full justify-center">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 bg-green-100 text-green-500 rounded-full flex items-center justify-center">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
                     </div>
+                    <h3 className="text-xl font-bold text-gray-800">Booking Approved!</h3>
                   </div>
-                  <div>
-                    <h3 className="font-bold text-gray-900 text-lg">Audi RS7 Sportback</h3>
-                    <p className="text-sm text-gray-500">2023 Model • Automatic</p>
-                    <div className="mt-2 inline-flex items-center gap-1.5 bg-gray-100 px-2.5 py-1 rounded-md text-xs font-semibold text-gray-700">
-                      <ShieldCheck className="w-3.5 h-3.5 text-green-600" /> Insured
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4 mb-6 text-sm">
-                  <div className="flex justify-between items-center text-gray-600">
-                    <span>Rental Fee (3 Days)</span>
-                    <span className="font-medium text-gray-900">$450.00</span>
-                  </div>
-                  <div className="flex justify-between items-center text-gray-600">
-                    <span>Delivery Charge</span>
-                    <span className="font-medium text-gray-900">$20.00</span>
-                  </div>
-                  <div className="flex justify-between items-center text-gray-600">
-                    <span>Taxes & Fees</span>
-                    <span className="font-medium text-gray-900">$47.00</span>
-                  </div>
+                  <p className="text-gray-600 mb-4">Complete your payment securely via Stripe below to finalize the rental.</p>
                   
-                  {/* Coupon Code mock */}
-                  <div className="pt-4 border-t border-gray-100">
-                    <div className="flex gap-2">
-                      <input type="text" placeholder="Promo Code" className="w-full p-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:outline-none focus:border-black" />
-                      <button className="px-4 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-semibold transition-colors">Apply</button>
-                    </div>
-                  </div>
+                  <Elements stripe={stripePromise}>
+                    <PaymentForm 
+                      booking={booking} 
+                      onSuccess={(updatedBooking) => setBooking(updatedBooking)} 
+                    />
+                  </Elements>
                 </div>
-
-                <div className="pt-4 border-t border-gray-200 mb-8">
-                  <div className="flex justify-between items-end">
-                    <div>
-                      <p className="text-sm text-gray-500 font-medium mb-1">Total Amount</p>
-                      <p className="text-3xl font-extrabold text-gray-900">$517.00</p>
-                    </div>
+              ) : booking.status === 'paid' ? (
+                // State 4: Paid
+                <div className="flex flex-col items-center justify-center h-full text-center py-10">
+                  <div className="w-20 h-20 bg-green-500 text-white rounded-full flex items-center justify-center mb-6 shadow-lg shadow-green-200">
+                    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
                   </div>
+                  <h3 className="text-3xl font-bold text-gray-800 mb-2">Payment Successful!</h3>
+                  <p className="text-gray-600 mb-8">
+                    You have successfully finalized your booking for the {vehicle?.name}. Enjoy your ride!
+                  </p>
+                  <button 
+                    onClick={() => navigate('/cart')}
+                    className="px-8 py-3 bg-gray-900 text-white rounded-lg font-bold"
+                  >
+                    Return to Cart
+                  </button>
                 </div>
-
-                <button className="w-full py-4 sm:py-4.5 bg-gray-900 hover:bg-black text-white rounded-xl font-bold text-base sm:text-lg cursor-pointer transition-all duration-300 uppercase tracking-wide shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:-translate-y-0.5 active:translate-y-0 relative overflow-hidden group">
-                  <span className="relative z-10 flex items-center justify-center gap-2">
-                    Confirm & Pay
-                  </span>
-                </button>
-
-                <p className="text-xs text-center text-gray-500 mt-4 flex items-center justify-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-green-600" />
-                  Payments are secure and encrypted
-                </p>
-
-              </div>
+              ) : (
+                // Other states (pending, cancelled, etc)
+                <div className="flex flex-col items-center justify-center h-full text-center">
+                  <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mb-6">
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">Status: {booking.status}</h3>
+                  <p className="text-gray-600">This booking is not available for payment at this time.</p>
+                  <button onClick={() => navigate('/cart')} className="mt-6 px-6 py-2 border rounded-lg hover:bg-gray-100">Back to Cart</button>
+                </div>
+              )}
             </div>
-
           </div>
+          
         </div>
       </div>
       <Footer />
     </>
-  )
-}
+  );
+};
 
-export default Checkout
+export default Checkout;
